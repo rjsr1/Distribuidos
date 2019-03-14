@@ -10,21 +10,18 @@ import (
 )
 
 func validate(A string) bool{
-	
-	var V bool
-	V = true
-
     strs := strings.Split(A, ",")
     ary := make([]int, len(strs))
     for i := range ary {
 	    ary[i], _ = strconv.Atoi(strs[i])
-		if ary[i] < 0 {
-		    V = false
+		if ary[i] <= 0 {
+		    return false
 		}else if reflect.TypeOf(ary[i]).String() !=  "int" {
-			V = false
+			return false
 		}
     }
-	return V
+	
+	return true
 }
 
 func main() {
