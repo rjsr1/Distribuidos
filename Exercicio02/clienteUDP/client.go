@@ -14,7 +14,7 @@ func main() {
   for { 
     
     reader := bufio.NewReader(os.Stdin)
-    fmt.Print("Text to send: ")
+    fmt.Print("Texto: ")
     text, _ := reader.ReadString('\n')
     
     fmt.Fprintf(conn, text + "\n")	

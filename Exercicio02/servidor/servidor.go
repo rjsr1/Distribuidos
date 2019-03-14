@@ -4,7 +4,7 @@ import "net"
 import "fmt"
 import "bufio"
 import "strings" 
-import "strconv"// only needed below for sample processing
+import "strconv"
 
 
 func mdc(a int,b int) int{
@@ -29,53 +29,45 @@ func mmc(a int,b int) int{
 
 
 func main() {
- //conn2,_ := net.Dial("tcp","127.0.0.1:8082")
-  fmt.Println("Launching server...")
+ 
+  fmt.Println("Launching server...")  
+  ln, _ := net.Listen("tcp", "127.0.0.1:8081")
 
-  // listen on all interfaces
-  ln, _ := net.Listen("udp", ":8081")
-
-  // accept connection on port
   conn, _ := ln.Accept()
-
-  // run loop forever (or until ctrl-c)
+  connv,_ := net.Dial("tcp","127.0.0.1:8082")
   for {
-    // will listen for message to process ending in newline (\n)
+    
     message, _ := bufio.NewReader(conn).ReadString('\n') 
-    // fmt.Println("mensagem : ")
-    // fmt.Println(message)
-    message=strings.Trim(message, "\r\n")      
-    // fmt.Println("apos trim : ")
-    // fmt.Println(message)
-    numbersReceived := strings.Split(message,",")
-    // fmt.Println("numbers Received : ")
-    // fmt.Println(numbersReceived)
-    // fmt.Println("tamanho array : ")
-    arraySize:=len(numbersReceived)
-    // fmt.Println(arraySize)
+    
+    connv.Write([]byte(message))
+    validateMessage, _ := bufio.NewReader(connv).ReadString('\n') 
+    fmt.Println(validateMessage)
+    if strings.Contains(validateMessage,"Formato invalido"){
+      conn.Write([]byte("Formato invalido" + "\n"))
+    }else{
+    
+    message=strings.Trim(message, "\r\n")     
+    
+    numbersReceived := strings.Split(message,",")    
+    arraySize:=len(numbersReceived)    
     numbers :=make([]int, arraySize);
-    for a:=0;a<arraySize;a++ {
-      // fmt.Println("numero recebido na posicao a")
-      // fmt.Println(numbersReceived[a])
-      i,_ := strconv.Atoi(numbersReceived[a])
-      // fmt.Println("numero apos conversao")
-      // fmt.Println(i)
-      numbers[a] = i
-      // fmt.Println(numbers)
+
+    for a:=0;a<arraySize;a++ {    
+      i,_ := strconv.Atoi(numbersReceived[a])     
+      numbers[a] = i     
     }
     mmcTotal:=1
     if len(numbers)>1{
        for i:=0;i<len(numbers);i++ {
-        mmcTotal = mmc(mmcTotal,numbers[i])
-        // fmt.Printf("no main -> i = %d,numero = %d , mmcTotal= %d '\n' ",i,numbers[i],mmcTotal)
+        mmcTotal = mmc(mmcTotal,numbers[i])      
       }
     }  
-    // output message received
+    
     fmt.Println("MMC calculado = ", mmcTotal)
-    //fmt.Fprintf(conn2," enviando mensagem ao servidor 02 "+string(message)+ "\n")
-    // sample process for string received
+    
     newmessage := strconv.Itoa(mmcTotal)
-    // send new string back to client
+    
     conn.Write([]byte(newmessage + "\n"))
+    }
   }
 }

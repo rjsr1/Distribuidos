@@ -1,52 +1,48 @@
 package main
 
 import (
-	"net"
+	  "net"
     "fmt"
-	"bufio"
+  	"bufio"
     "strings"
     "strconv"
-	"reflect"
 )
 
 func validate(A string) bool{
+    A=strings.Trim(A, "\r\n")  
     strs := strings.Split(A, ",")
     ary := make([]int, len(strs))
     for i := range ary {
-	    ary[i], _ = strconv.Atoi(strs[i])
+      ary[i], _ = strconv.Atoi(strs[i])      
 		if ary[i] <= 0 {
 		    return false
-		}else if reflect.TypeOf(ary[i]).String() !=  "int" {
-			return false
 		}
     }
 	
 	return true
 }
 
-func main() {
-	
-    // listen on all interfaces
-    ln, _ := net.Listen("tcp", ":8081")
-    // accept connection on port
+func main() {	
+   
+    ln, _ := net.Listen("tcp", ":8082")
+    
     conn, _ := ln.Accept()
-    // run loop forever (or until ctrl-c)
+   
     for {
-      // will listen for message to process ending in newline (\n)
+      
       message, _ := bufio.NewReader(conn).ReadString('\n')
-      // output message received
+     
       fmt.Print("Messagem Recebida:", string(message))
-      // sample process for string received
+    
 	  if last := len(message) - 1; last >= 0{
         message = message[:last]
 		}
-	  if validate(message) == true{
-		conne,_ := net.Dial("tcp", "127.0.0.1:8082")
-		fmt.Fprintf(conne, message + "\n")
+	  if validate(message) == true{    
+    conn.Write([]byte(message + "\n"))	
 	  }else{
 	    newmessage := "Formato invalido"
-		conn.Write([]byte(newmessage + "\n"))
-	  }
+		  conn.Write([]byte(newmessage + "\n"))
+	    }
     }
 	
 }
