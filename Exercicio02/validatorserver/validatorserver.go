@@ -44,8 +44,8 @@ func main() {
         message = message[:last]
 		}
 	  if validate(message) == true{
-		conn,_ := net.Dial("tcp", "127.0.0.1:8082")
-		fmt.Fprintf(conn, message + "\n")
+		conne,_ := net.Dial("tcp", "127.0.0.1:8082")
+		fmt.Fprintf(conne, message + "\n")
 	  }else{
 	    newmessage := "Formato invalido"
 		conn.Write([]byte(newmessage + "\n"))
