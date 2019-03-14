@@ -19,7 +19,6 @@ func main() {
     
     fmt.Fprintf(conn, text + "\n")	
     
-    
     n,_,_ := conn.ReadFrom(buffer) 
     message := string(buffer[0:n]) 
     fmt.Println("Message from server: "+message)
