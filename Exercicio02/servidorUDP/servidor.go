@@ -5,10 +5,7 @@ import "fmt"
 import "strings" 
 import "strconv"
 
-type UDPServer struct{
-  endereco string
-  server *net.UDPConn
-}
+
 func mdc(a int,b int) int{
   if a<b{
     tempa:=a
@@ -35,16 +32,25 @@ func main() {
   fmt.Println("Launching server...")
   
   pc,_:= net.ListenPacket("udp",":6081") 
+
+  LocalAddr, _ := net.ResolveUDPAddr("udp", "127.0.0.1:55951")
+  connv,_ := net.DialUDP("udp",LocalAddr,&net.UDPAddr{IP:[]byte{127,0,0,1},Port:6082,Zone:""})
   
   buffer := make([]byte, 1024)
+  bufferValidation :=make([]byte,1024)
 
   
   for {
+    n,clientAddress,_ := pc.ReadFrom(buffer)  
     
-    
-    n,address,_ := pc.ReadFrom(buffer)  
-
     message := string(buffer[0:n]) 
+    fmt.Fprintf(connv, message + "\n")	
+    
+    va,_,_ := connv.ReadFrom(bufferValidation) 
+    validateMessage := string(bufferValidation[0:va])     
+    if strings.Contains(validateMessage,"Formato invalido"){
+      pc.WriteTo([]byte("Formato invalido"),clientAddress) 
+    }else{
     
     message=strings.Trim(message, "\r\n")      
     
@@ -65,8 +71,8 @@ func main() {
     }      
     fmt.Println("MMC calculado = ", mmcTotal)   
     newmessage := strconv.Itoa(mmcTotal)
-   
-    fmt.Println(address)
-    pc.WriteTo([]byte(newmessage),address) 
+      
+    pc.WriteTo([]byte(newmessage),clientAddress) 
+  }
   }
 }

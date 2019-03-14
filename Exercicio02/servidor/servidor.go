@@ -40,8 +40,7 @@ func main() {
     message, _ := bufio.NewReader(conn).ReadString('\n') 
     
     connv.Write([]byte(message))
-    validateMessage, _ := bufio.NewReader(connv).ReadString('\n') 
-    fmt.Println(validateMessage)
+    validateMessage, _ := bufio.NewReader(connv).ReadString('\n')     
     if strings.Contains(validateMessage,"Formato invalido"){
       conn.Write([]byte("Formato invalido" + "\n"))
     }else{
