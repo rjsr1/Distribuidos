@@ -2,11 +2,13 @@ package main
 
 import "net"
 import "fmt"
-import "bufio"
 import "strings" 
 import "strconv"// only needed below for sample processing
 
-
+type UDPServer struct{
+  endereco string
+  server *net.UDPConn
+}
 func mdc(a int,b int) int{
   if a<b{
     tempa:=a
@@ -31,17 +33,18 @@ func mmc(a int,b int) int{
 func main() {
  //conn2,_ := net.Dial("tcp","127.0.0.1:8082")
   fmt.Println("Launching server...")
-
-  // listen on all interfaces
-  ln, _ := net.Listen("udp", ":8081")
-
-  // accept connection on port
-  conn, _ := ln.Accept()
+  
+  pc,_:= net.ListenPacket("udp",":6081") 
+  
+  buffer := make([]byte, 1024)
 
   // run loop forever (or until ctrl-c)
   for {
     // will listen for message to process ending in newline (\n)
-    message, _ := bufio.NewReader(conn).ReadString('\n') 
+    
+    n,address,_ := pc.ReadFrom(buffer)  
+
+    message := string(buffer[0:n]) 
     // fmt.Println("mensagem : ")
     // fmt.Println(message)
     message=strings.Trim(message, "\r\n")      
@@ -76,6 +79,8 @@ func main() {
     // sample process for string received
     newmessage := strconv.Itoa(mmcTotal)
     // send new string back to client
-    conn.Write([]byte(newmessage + "\n"))
+    fmt.Println(address)
+    pc.WriteTo([]byte(newmessage),address)
+   // conn.Write([]byte(newmessage + "\n"))
   }
 }
