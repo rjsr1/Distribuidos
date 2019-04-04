@@ -3,11 +3,51 @@ package main
 import (
   //"encoding/json"
  	"fmt"
- 	"os"
+ 	//"os"
   "log"
- "bufio"
-  "github.com/streadway/amqp"
+  //"bufio"
+	"github.com/streadway/amqp"
+	"math/rand"
+	"strconv"
+	"strings"
+	"time"
 )
+func qtdNumbers() int{
+	return rand.Intn(10)
+}
+
+func joinMmcArgs(mmcArgs []string) string {
+	var sb strings.Builder
+	for _, r := range mmcArgs {
+		sb.WriteString(r)
+		sb.WriteString(",")
+	}
+	mmcArgsGenerated:=strings.Trim(sb.String(),",")
+	return mmcArgsGenerated
+}
+
+//funcao para gerar uma string de entrada ex: "1,2,3,4..."
+func mmcArgGenerator() string {
+	mmcArgs:= make([] string,qtdNumbers())
+	for i:=0;i<len(mmcArgs);i++{
+		mmcArgs[i] = strconv.Itoa(rand.Intn(1000)+1)
+	}
+	return joinMmcArgs(mmcArgs)
+}
+
+func deleteAllQueues(){
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	failOnError(err, "Failed to connect to RabbitMQ")
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+	failOnError(err, "Failed to open a channel")
+	defer ch.Close()	  
+	ch.QueueDelete("MMCArgs",false,false,false)
+	ch.QueueDelete("ValidationArgs",false,false,false)
+	ch.QueueDelete("validationResult",false,false,false)
+	ch.QueueDelete("MMCResult",false,false,false)
+}
 
 // type MMCArgs struct{
 // 	numbers string
@@ -26,10 +66,8 @@ func failOnError(err error, msg string) {
 
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
-
-	q, err := ch.QueueDeclare(
-		"MMCArgs", // name
+	defer ch.Close()	  
+	q, err := ch.QueueDeclare("MMCArgs", // name
 		false,   // durable
 		false,   // delete when unused
 		false,   // exclusive
@@ -47,7 +85,7 @@ func failOnError(err error, msg string) {
 	)
 	failOnError(err, "Failed to declare a queue")
 
-	msgs, err := ch.Consume(
+	msgsFromServer, err := ch.Consume(
 		r.Name, // queue
 		"",     // consumer
 		true,   // auto-ack
@@ -56,27 +94,57 @@ func failOnError(err error, msg string) {
 		false,  // no-wait
 		nil,    // args
 	)
-	go func(){
-		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
-		}
-	}()
+	// go func(){
+	// 	for d := range msgsFromServer {
+	// 		log.Printf("Received a message: %s", d.Body)
+	// 	}
+	// }()
 
-	for { 
-   
-    reader := bufio.NewReader(os.Stdin)
-    fmt.Print("Text to send: ")
-		text, _ := reader.ReadString('\n')  
+	
+	 fmt.Print("iniciando teste com 5000 entradas")
+	 totalTime:= 0.0
+	 for i := 0; i <5000; i++{
+			mmcArg := mmcArgGenerator()
+			fmt.Println("Argumento ===============")
+			fmt.Println(mmcArg)
+			err = ch.Publish(
+						"",     // exchange
+						q.Name, // routing key
+						false,  // mandatory
+						false,  // immediate
+						amqp.Publishing{
+							ContentType: "text/plain",
+							Body:        []byte(mmcArg),
+						})
+
+		t1 := time.Now()			
+		failOnError(err, "Falha ao publicar mmc args")  
+					
+		<- msgsFromServer
+		t2 := time.Now()
+		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
+		totalTime= totalTime + x
+		fmt.Println(x)
+	 }
+	 	fmt.Print("Tempo Total = ")
+		fmt.Println(totalTime)
+
+
+	 
+    //reader := bufio.NewReader(os.Stdin)
+		//fmt.Print("Text to send: ")
 		
-    err = ch.Publish(
-			"",     // exchange
-			q.Name, // routing key
-			false,  // mandatory
-			false,  // immediate
-			amqp.Publishing{
-				ContentType: "text/plain",
-				Body:        []byte(text),
-			})
-		failOnError(err, "Failed to publish mmc args")    
-  }
+		//text, _ := reader.ReadString('\n')  
+		
+  //   err = ch.Publish(
+	// 		"",     // exchange
+	// 		q.Name, // routing key
+	// 		false,  // mandatory
+	// 		false,  // immediate
+	// 		amqp.Publishing{
+	// 			ContentType: "text/plain",
+	// 			Body:        []byte(text),
+	// 		})
+	// 	failOnError(err, "Failed to publish mmc args")    
+  // }
 }
