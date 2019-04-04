@@ -2,14 +2,39 @@ package main
 
 import (
   "fmt"
+  "math/rand"
+  "strconv"
   "log"
   "net"
   "net/rpc"
   "time"
-  "bufio"
+  //"bufio"
   "os"
   "strings"
 )
+
+func qtdNumbers() int{
+	return rand.Intn(10)
+}
+
+func joinMmcArgs(mmcArgs []string) string {
+	var sb strings.Builder
+	for _, r := range mmcArgs {
+		sb.WriteString(r)
+		sb.WriteString(",")
+	}
+	mmcArgsGenerated:=strings.Trim(sb.String(),",")
+	return mmcArgsGenerated
+}
+
+//funcao para gerar uma string de entrada ex: "1,2,3,4..."
+func mmcArgGenerator() string {
+	mmcArgs:= make([] string,qtdNumbers())
+	for i:=0;i<len(mmcArgs);i++{
+		mmcArgs[i] = strconv.Itoa(rand.Intn(1000)+1)
+	}
+	return joinMmcArgs(mmcArgs)
+}
 
 func main() {
   conn, err := net.DialTimeout("tcp", "localhost:8080", time.Minute)
@@ -20,11 +45,13 @@ func main() {
   client := rpc.NewClient(conn)
 
   var reply int
-  for{
-	  fmt.Printf("Digite sua lista de numeros separados por virgula: ")
+  
+  
+  for i := 0; i <5000; i++{
+	  //fmt.Printf("Digite sua lista de numeros separados por virgula: ")
 	  
-	  message, _ := bufio.NewReader(os.Stdin).ReadString('\n') 
-	  
+	  //message, _ := bufio.NewReader(os.Stdin).ReadString('\n') 
+	  message := mmcArgGenerator()
 	  if strings.Trim(message, "\r\n") == "exit" {
 	  
 		os.Exit(1)
