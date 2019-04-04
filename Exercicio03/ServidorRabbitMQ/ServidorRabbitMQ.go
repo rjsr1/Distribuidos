@@ -32,11 +32,11 @@ func failOnError(err error, msg string) {
 
 func main() {
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
+	failOnError(err, "Falha ao connectar ao RabbitMQ")
 	defer conn.Close()
 
 	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
+	failOnError(err, "Falha ao abrir um channel")
 	defer ch.Close()
 
 	//declara queue para arg mmc
@@ -164,7 +164,7 @@ func main() {
 			failOnError(err, "Failed to publish mmc args")    
 		}
 	}()
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	log.Printf(" [*] aguardando mensagens.")
 	<-forever
 
 }

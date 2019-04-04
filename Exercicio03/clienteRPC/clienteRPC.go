@@ -9,8 +9,9 @@ import (
   "net/rpc"
   "time"
   //"bufio"
-  "os"
-  "strings"
+  // "os"
+	"strings"
+	
 )
 
 func qtdNumbers() int{
@@ -46,28 +47,39 @@ func main() {
 
   var reply int
   
-  
+	totalTime:= 0.0
+
   for i := 0; i <5000; i++{
 	  //fmt.Printf("Digite sua lista de numeros separados por virgula: ")
 	  
 	  //message, _ := bufio.NewReader(os.Stdin).ReadString('\n') 
 	  message := mmcArgGenerator()
-	  fmt.Printf(message)
-	  fmt.Printf("\n")
+	  //fmt.Printf(message)
+	  //fmt.Printf("\n")
 	  
-	  if strings.Trim(message, "\r\n") == "exit" {
+	  // if strings.Trim(message, "\r\n") == "exit" {
 	  
-		os.Exit(1)
-		}
-
-	  e := client.Call("Service.MMC", &message, &reply)
+		// os.Exit(1)
+		// }
+		t1 := time.Now()
+		e := client.Call("Service.MMC", &message, &reply)		
 	  if e != nil {
 		log.Fatalf("Algo deu errado: %v", e.Error())
 	  }else{
 		if reply == -1{
 			fmt.Printf("Lista de valores inválida. \n")
 		}else{
-	  fmt.Printf("Seu MMC é: %d \n", reply)}
-	  }
-	}
+
+			t2 := time.Now()		
+			x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
+			totalTime= totalTime + x
+			fmt.Println("totalTime")
+			fmt.Println(totalTime)
+			//fmt.Printf("Seu MMC é: %d \n", reply)}			
+	  	}
+		}	
+	}	
+	fmt.Println("tempo total acima...")
+	fmt.Println(totalTime)
+
 }

@@ -3,14 +3,14 @@ package main
 import (
   //"encoding/json"
  	"fmt"
- 	//"os"
-  "log"
-  //"bufio"
+ 	"os"
+  	"log"
+  	"bufio"
 	"github.com/streadway/amqp"
 	"math/rand"
 	"strconv"
 	"strings"
-	"time"
+	// "time"
 )
 func qtdNumbers() int{
 	return rand.Intn(10)
@@ -28,9 +28,9 @@ func joinMmcArgs(mmcArgs []string) string {
 
 //funcao para gerar uma string de entrada ex: "1,2,3,4..."
 func mmcArgGenerator() string {
-	mmcArgs:= make([] string,qtdNumbers())
+	mmcArgs:= make([] string,1000)	
 	for i:=0;i<len(mmcArgs);i++{
-		mmcArgs[i] = strconv.Itoa(rand.Intn(1000)+1)
+		mmcArgs[i] = strconv.Itoa(i+1)
 	}
 	return joinMmcArgs(mmcArgs)
 }
@@ -67,7 +67,7 @@ func failOnError(err error, msg string) {
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()	  
-	q, err := ch.QueueDeclare("MMCArgs", // name
+	requestMMC, err := ch.QueueDeclare("MMCArgs", // name
 		false,   // durable
 		false,   // delete when unused
 		false,   // exclusive
@@ -75,7 +75,7 @@ func failOnError(err error, msg string) {
 		nil,     // arguments
 	)
 
-	r, err := ch.QueueDeclare(
+	responseMMC, err := ch.QueueDeclare(
 		"MMCResult", // name
 		false,   // durable
 		false,   // delete when unused
@@ -86,7 +86,7 @@ func failOnError(err error, msg string) {
 	failOnError(err, "Failed to declare a queue")
 
 	msgsFromServer, err := ch.Consume(
-		r.Name, // queue
+		responseMMC.Name, // queue
 		"",     // consumer
 		true,   // auto-ack
 		false,  // exclusive
@@ -94,57 +94,56 @@ func failOnError(err error, msg string) {
 		false,  // no-wait
 		nil,    // args
 	)
-	// go func(){
-	// 	for d := range msgsFromServer {
-	// 		log.Printf("Received a message: %s", d.Body)
-	// 	}
-	// }()
+	go func(){
+		for d := range msgsFromServer {
+			log.Printf("Received a message: %s", d.Body)
+		}
+	}()
 
-	
-	 fmt.Print("iniciando teste com 5000 entradas")
-	 totalTime:= 0.0
-	 for i := 0; i <5000; i++{
-			mmcArg := mmcArgGenerator()
-			fmt.Println("Argumento ===============")
-			fmt.Println(mmcArg)
-			err = ch.Publish(
-						"",     // exchange
-						q.Name, // routing key
-						false,  // mandatory
-						false,  // immediate
-						amqp.Publishing{
-							ContentType: "text/plain",
-							Body:        []byte(mmcArg),
-						})
+	//codigo para analise de desempenho
+	//  fmt.Print("iniciando teste com 5000 entradas")
+	//  totalTime:= 0.0
+	//  for i := 0; i <5000; i++{
+	// 		mmcArg := mmcArgGenerator()
+	// 		//fmt.Println("Argumento ===============")
+	// 		//fmt.Println(mmcArg)
+	// 		t1 := time.Now()	
+	// 		err = ch.Publish(
+	// 					"",     // exchange
+	// 					requestMMC.Name, // routing key
+	// 					false,  // mandatory
+	// 					false,  // immediate
+	// 					amqp.Publishing{
+	// 						ContentType: "text/plain",
+	// 						Body:        []byte(mmcArg),
+	// 					})
 
-		t1 := time.Now()			
-		failOnError(err, "Falha ao publicar mmc args")  
+				
+	// 	failOnError(err, "Falha ao publicar mmc args")  
 					
-		<- msgsFromServer
-		t2 := time.Now()
-		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
-		totalTime= totalTime + x
-		fmt.Println(x)
-	 }
-	 	fmt.Print("Tempo Total = ")
-		fmt.Println(totalTime)
-
+	// 	<- msgsFromServer
+	// 	t2 := time.Now()
+	// 	x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
+	// 	totalTime= totalTime + x
+	// 	fmt.Println(x)
+	//  }
+	//  	fmt.Print("Tempo Total = ")
+	// 	fmt.Println(totalTime)
 
 	 
-    //reader := bufio.NewReader(os.Stdin)
-		//fmt.Print("Text to send: ")
+    reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Text to send: ")
 		
-		//text, _ := reader.ReadString('\n')  
+		text, _ := reader.ReadString('\n')  
 		
-  //   err = ch.Publish(
-	// 		"",     // exchange
-	// 		q.Name, // routing key
-	// 		false,  // mandatory
-	// 		false,  // immediate
-	// 		amqp.Publishing{
-	// 			ContentType: "text/plain",
-	// 			Body:        []byte(text),
-	// 		})
-	// 	failOnError(err, "Failed to publish mmc args")    
-  // }
-}
+    err = ch.Publish(
+			"",     // exchange
+			requestMMC.Name, // routing key
+			false,  // mandatory
+			false,  // immediate
+			amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        []byte(text),
+			})
+		failOnError(err, "Failed to publish mmc args")    
+  }
