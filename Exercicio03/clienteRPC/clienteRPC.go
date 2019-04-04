@@ -47,13 +47,13 @@ func main() {
   var reply int
   
   
-  for i := 0; i <5000; i++{
-	  //fmt.Printf("Digite sua lista de numeros separados por virgula: ")
+  for {
+	  fmt.Printf("Digite sua lista de numeros separados por virgula: ")
 	  
-	  //message, _ := bufio.NewReader(os.Stdin).ReadString('\n') 
-	  message := mmcArgGenerator()
-	  fmt.Printf(message)
-	  fmt.Printf("\n")
+	  message, _ := bufio.NewReader(os.Stdin).ReadString('\n') 
+	  //message := mmcArgGenerator()
+	  //fmt.Printf(message)
+	  //fmt.Printf("\n")
 	  
 	  if strings.Trim(message, "\r\n") == "exit" {
 	  
