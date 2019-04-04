@@ -17,7 +17,6 @@ func (l *Service) Valid(args *string, reply *bool) error {
   ary := make([]int, len(numbersReceived))
   for i := range ary {
 	ary[i], _ = strconv.Atoi(numbersReceived[i])
-	fmt.Printf(" %d \n", ary[i])
 	if ary[i] <= 0 {
 		*reply = false
 		break		
