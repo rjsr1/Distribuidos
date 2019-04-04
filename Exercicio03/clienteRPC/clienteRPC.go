@@ -8,10 +8,9 @@ import (
   "net"
   "net/rpc"
   "time"
-  //"bufio"
-  // "os"
-	"strings"
-	
+  "bufio"
+  "os"
+  "strings"
 )
 
 func qtdNumbers() int{
@@ -47,13 +46,12 @@ func main() {
 
   var reply int
   
-	totalTime:= 0.0
-
-  for i := 0; i <5000; i++{
-	  //fmt.Printf("Digite sua lista de numeros separados por virgula: ")
+  
+  for {
+	  fmt.Printf("Digite sua lista de numeros separados por virgula: ")
 	  
-	  //message, _ := bufio.NewReader(os.Stdin).ReadString('\n') 
-	  message := mmcArgGenerator()
+	  message, _ := bufio.NewReader(os.Stdin).ReadString('\n') 
+	  //message := mmcArgGenerator()
 	  //fmt.Printf(message)
 	  //fmt.Printf("\n")
 	  
