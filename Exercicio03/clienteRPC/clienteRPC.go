@@ -29,9 +29,9 @@ func joinMmcArgs(mmcArgs []string) string {
 
 //funcao para gerar uma string de entrada ex: "1,2,3,4..."
 func mmcArgGenerator() string {
-	mmcArgs:= make([] string,qtdNumbers())
+	mmcArgs:= make([] string,1000)	
 	for i:=0;i<len(mmcArgs);i++{
-		mmcArgs[i] = strconv.Itoa(rand.Intn(1000)+1)
+		mmcArgs[i] = strconv.Itoa(i+1)
 	}
 	return joinMmcArgs(mmcArgs)
 }
@@ -52,6 +52,9 @@ func main() {
 	  
 	  //message, _ := bufio.NewReader(os.Stdin).ReadString('\n') 
 	  message := mmcArgGenerator()
+	  fmt.Printf(message)
+	  fmt.Printf("\n")
+	  
 	  if strings.Trim(message, "\r\n") == "exit" {
 	  
 		os.Exit(1)
