@@ -65,7 +65,9 @@ func (l *Service) MMC(args *string, reply *int) error {
 		   for i:=0;i<len(numbers);i++ {
 			mmcTotal = mmc(mmcTotal,numbers[i])      
 		  }
-		}    
+		}else{
+		   mmcTotal = numbers[0]
+		}
 		fmt.Println("MMC calculado = ", mmcTotal)
 		*reply = mmcTotal
 		}else{
