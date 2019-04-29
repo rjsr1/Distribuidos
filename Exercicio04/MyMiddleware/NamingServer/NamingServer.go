@@ -52,8 +52,7 @@ func list() []nameRegistry{
 }
 func failOnError(err error, msg string) {
 	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
-		//lembrar de encerrar aqui
+		log.Fatalf("%s: %s", msg, err)		
 	}
 }
 
