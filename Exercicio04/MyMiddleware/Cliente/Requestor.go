@@ -90,7 +90,7 @@ func invoke(inv invocation) replyInvocation{
 	if msgReplied.ReplyHeader.Status == "200"{
 		replyInv.result=msgReplied.ReplyBody.OperationResult
 	}else{
-		replyInv.result="erro ao fazer solicitação" //nao sei se eh a melhor opcao
+		replyInv.result="erro ao fazer solicitação" 
 	}
 	return replyInv
 

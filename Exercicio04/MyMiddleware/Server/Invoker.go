@@ -105,7 +105,7 @@ func demultiplexer(request messageBody) string{
 	return response
 }
 
-func invoker(){	
+func invoker(){		
 	log.Println("invoker - iniciando start Naming Server")	
 	for {		
 		request:= receive()

@@ -24,7 +24,7 @@ func main(){
 	registryInfo.Proxy.Port="8082"
 	registryInfo.Proxy.IP="127.0.0.1"
 	registryInfo.Proxy.ID="123"
-	registryInfo.ServiceName="MMC_Calculator"
+	registryInfo.ServiceName="MMC_Calculator"	
 	bind(registryInfo)
 
 	

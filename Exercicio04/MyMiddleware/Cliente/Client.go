@@ -22,7 +22,7 @@ type clientProxy struct{
 func main(){
 	proxy:=lookup("MMC_Calculator")
 	mmcProxy=proxy
-	resultTest:=calculateMMC([] string {"1,2,3,4,5,6,7,8,9,10"})
+	resultTest:=calculateMMC([] string {"1,2,3,4,5,6,7,8,9,10"+"/n"})
 	log.Println("Client - recebendo este result")
 	log.Println(resultTest)
 }

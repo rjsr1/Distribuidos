@@ -8,11 +8,14 @@ import (
 )
 var connection net.Conn
 
+
+
+
 func startServer(){
 	log.Println("SRH - iniciando escuta no server request handler")
 	 
 	//ouvindo na porta 8081
-	ln, err := net.Listen("tcp", "127.0.0.1:8081")
+	ln, err := net.Listen("tcp", "127.0.0.1:8082")
 	log.Println("SRH - apos net listen")
 	failOnError(err,"SRH - falha ao iniciar escuta")
 	
@@ -31,9 +34,10 @@ func receive() [] byte{
 		failOnError(err,"falha ao receber dados")
 		return message		
 }
-func send(response [] byte){
-	log.Println("SRH - Enviando seguinte mensagem como resposta")
-	log.Println(response)
-	_,err := connection.Write(response)
+func send(sendData [] byte){
+	log.Println("SRH - Enviando seguinte mensagem"+string(sendData))
+	log.Println("SHR - enviando sendData"+string(sendData))
+	log.Println(connection.RemoteAddr())
+	_,err := connection.Write(sendData)
 	failOnError(err,"falha ao enviar resposta")
 }
