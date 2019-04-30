@@ -3,6 +3,8 @@ import(
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
+	"strconv"
 )
 
 type invocation struct {
@@ -54,6 +56,24 @@ type arg struct{
 }
 
 
+func mdc(a int,b int) int{
+	if a<b{
+	  tempa:=a
+	  a=b
+	  b=tempa
+	}
+	for b!=0 {    
+	  r := a%b 
+	  a=b
+	  b=r
+	  // fmt.Printf("no mdc -> a = %d , b= %d , r=%d '\n' ",a,b,r)
+	}
+	return a;
+  }
+  func mmc(a int,b int) int{
+	// fmt.Printf("no mmc -> a = %d , b= %d '\n' ",a,b)
+	return a*(b/mdc(a,b))
+  }
 
 func demultiplexer(request messageBody) string{
 	log.Println("invoker - iniciando demultiplaxer")	
@@ -63,9 +83,22 @@ func demultiplexer(request messageBody) string{
 	if request.RequestHeader.Operation == "MMC" {
 		log.Println("invoker - operacao foi MMC")	
 		mmcArray := request.RequestBody.Parameters[0]
-		
-		//calculo mmc
-		response="12345"
+		values:=strings.Trim(mmcArray, "\r\n")     
+		numbersReceived := strings.Split(values,",")    
+    	arraySize:=len(numbersReceived)    
+    	numbers :=make([]int, arraySize);
+
+    	for a:=0;a<arraySize;a++ {    
+     		 i,_ := strconv.Atoi(numbersReceived[a])     
+      		numbers[a] = i     
+    	}
+    	mmcTotal:=1
+    	if len(numbers)>1{
+       		for i:=0;i<len(numbers);i++ {
+        		mmcTotal = mmc(mmcTotal,numbers[i])      
+      		}
+    	}  
+		response=strconv.Itoa(mmcTotal)
 	}
 
 	
