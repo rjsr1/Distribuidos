@@ -58,14 +58,16 @@ func invoker(){
 	startNamingServer()
 	log.Println("invoker - iniciando start Naming Server")	
 	for {		
-		request:= receiveRequest()
+		request:= receive()
 		log.Println("Invoker - recebido request")
 		operation := operationRequest{}
 		fmt.Println(request)
-		err:=json.Unmarshal([]byte(request),&operation)
-		failOnError(err,"falha ao fazer marshal do request")
+		err:=json.Unmarshal(request,&operation)
+		failOnError(err,"falha ao fazer unmarshal do request")
 		log.Println("Invoker - operation eh : "+operation.Operation)
 		response:=demultiplexer(operation)
-		sendResponse(response)
+		result,err:=json.Marshal(response+"\n")//adiciona delimitador de mensagem
+		failOnError(err,"falha ao fazer marshal do response")
+		send(result)
 	}
 }

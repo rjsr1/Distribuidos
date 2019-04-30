@@ -4,6 +4,7 @@ import (
 	"bufio"	
 	"net"
 	"log"
+	"io"
 )
 var connection net.Conn
 
@@ -22,17 +23,17 @@ func startNamingServer(){
 
 }
 
-func receiveRequest() string{	
+func receive() [] byte{	
 
-		message, err := bufio.NewReader(connection).ReadString('\n') 
+		message, err := bufio.NewReader(connection).ReadBytes('\n')
 		log.Println("SRH - seguinte mesagem recebida - ")
 		log.Println(message)
 		failOnError(err,"falha ao receber dados")
 		return message		
 }
-func sendResponse(response string){
+func send(response [] byte){
 	log.Println("SRH - Enviando seguinte mensagem como resposta")
 	log.Println(response)
-	_,err := connection.Write([]byte(response + "\n"))
+	_,err := connection.Write(response)
 	failOnError(err,"falha ao enviar resposta")
 }

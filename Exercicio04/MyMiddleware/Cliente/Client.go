@@ -18,12 +18,10 @@ type clientProxy struct{
 }
 
 
-// func lookup(serviceName string) clientProxy{
-// 	//faz chamada ao requestor para o servico de nomes.
-// 	return 
-// }
 
 func main(){
+	proxy:=lookup("MMC_Calculator")
+	mmcProxy=proxy
 	resultTest:=calculateMMC([] string {"1,2,3,4,5,6,7,8,9,10"})
 	log.Println("Client - recebendo este result")
 	log.Println(resultTest)

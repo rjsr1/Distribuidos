@@ -44,6 +44,16 @@ type messageBody struct{
 	ReplyHeader replyHeader
 	ReplyBody replyBody
 }
+type operationRequest struct {
+	Operation string
+    Args []arg
+}
+type arg struct{
+	Key string
+	Value string
+}
+
+
 
 func invoke(inv invocation) replyInvocation{
 
